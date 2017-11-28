@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,6 +24,7 @@ public class CompressOptions {
 
 
     public static File compress(File file, int reqWidth, int reqHeight, Bitmap.CompressFormat format, int quality, String outputPath) throws IOException {
+        Log.v("test", "compress:=" + Thread.currentThread().getName());
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);

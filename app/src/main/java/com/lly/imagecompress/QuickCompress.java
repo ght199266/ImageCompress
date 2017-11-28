@@ -29,8 +29,7 @@ public class QuickCompress {
     private String outputPath;
     private Bitmap.CompressFormat format;
 
-
-    ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService mSingleThreadExecutor;
 
     public QuickCompress(Builder builder) {
         this.mMaxHeight = builder.maxHeight;
@@ -38,10 +37,11 @@ public class QuickCompress {
         this.mQuality = builder.quality;
         this.outputPath = builder.outputPath;
         this.format = builder.format;
+        mSingleThreadExecutor = Executors.newSingleThreadExecutor();
     }
 
     public void execute(final File file, final CompressCallback callback) {
-        singleThreadExecutor.execute(new Runnable() {
+        mSingleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -53,6 +53,16 @@ public class QuickCompress {
                 }
             }
         });
+    }
+
+    public File load(final File file) {
+        File file1 = null;
+        try {
+            file1 = CompressOptions.compress(file, mMaxWidth, mMaxHeight, format, mQuality, outputPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return file1;
     }
 
 
