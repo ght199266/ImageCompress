@@ -1,6 +1,10 @@
 # Android 图片压缩工具
 
-#### 支持异步调用和Rxjava二种方式调用
+#### 效果图
+
+![image](https://github.com/ght199266/ImageCompress/blob/master/app/src/screenshots/screen.png)
+
+#### 支持异步调用和RxJava二种方式调用
 
 ##### 异步方式
 
