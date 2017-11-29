@@ -1,16 +1,21 @@
 package com.lly.imagecompress;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lly.imagecompress.call.CompressCallback;
+import com.lly.library.QuickCompress;
+import com.lly.library.call.CompressCallback;
 
 import java.io.File;
 
@@ -24,11 +29,12 @@ import io.reactivex.schedulers.Schedulers;
 import static android.os.Environment.getExternalStorageDirectory;
 
 public class MainActivity extends AppCompatActivity {
+    ImageView image, image2;
+    TextView tv_a, tv_b;
 
-    ImageView image;
-    ImageView image2;
 
-    private String path = getExternalStorageDirectory().getAbsolutePath() + "/aa.jpg";
+    private String ImagePath;
+    private static final int REQUEST_IMAGE_CODE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +44,15 @@ public class MainActivity extends AppCompatActivity {
         image = (ImageView) findViewById(R.id.image);
         image2 = (ImageView) findViewById(R.id.image2);
 
+        tv_a = (TextView) findViewById(R.id.tv_a);
+        tv_b = (TextView) findViewById(R.id.tv_b);
+
 
     }
 
     public void comress(View view) {
         //Rxjava方式
-        rxjava();
+        rxJava();
         //接口回调方式
 //        executeCall();
     }
@@ -55,14 +64,15 @@ public class MainActivity extends AppCompatActivity {
         QuickCompress quickCompress = new QuickCompress.Builder()
                 .maxHeight(1024)
                 .maxWidth(768)
-                .quality(80)
+                .quality(75)
                 .compressFormat(Bitmap.CompressFormat.JPEG)
                 .outputPath(getPath()).build();
-        quickCompress.execute(new File(path), new CompressCallback() {
+        quickCompress.execute(new File(ImagePath), new CompressCallback() {
             @Override
-            public void onComplete(File Images) {
-                Bitmap factory = BitmapFactory.decodeFile(Images.getAbsolutePath());
-                image.setImageBitmap(factory);
+            public void onComplete(File file) {
+                Bitmap factory = BitmapFactory.decodeFile(file.getAbsolutePath());
+                image2.setImageBitmap(factory);
+                tv_b.setText("图片大小：" + Utils.getFileSize(file));
             }
 
             @Override
@@ -77,15 +87,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Rxjava方式调用
      */
-    private void rxjava() {
-        Flowable.just(path).subscribeOn(Schedulers.io()).map(new Function<String, File>() {
+    private void rxJava() {
+        Flowable.just(ImagePath).subscribeOn(Schedulers.io()).map(new Function<String, File>() {
             @Override
             public File apply(@NonNull String path) throws Exception {
-                Log.v("test", "currentThread:=" + Thread.currentThread().getName());
                 QuickCompress quickCompress = new QuickCompress.Builder()
                         .maxHeight(1024)
                         .maxWidth(768)
-                        .quality(80)
+                        .quality(75)
                         .compressFormat(Bitmap.CompressFormat.JPEG)
                         .outputPath(getPath()).build();
                 return quickCompress.load(new File(path));
@@ -94,12 +103,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void accept(@NonNull File file) throws Exception {
                 Bitmap factory = BitmapFactory.decodeFile(file.getAbsolutePath());
-                image.setImageBitmap(factory);
+                image2.setImageBitmap(factory);
+                tv_b.setText("图片大小：" + Utils.getFileSize(file));
             }
         });
     }
 
 
+    /**
+     * 图片输出路径
+     *
+     * @return
+     */
     private String getPath() {
         File file1 = getExternalStorageDirectory();
         String fileName = System.currentTimeMillis() + ".jpg";
@@ -107,13 +122,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public int getBitmapSize(Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {     //API 19
-            return bitmap.getAllocationByteCount();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {//API 12
-            return bitmap.getByteCount();
-        } else {
-            return bitmap.getRowBytes() * bitmap.getHeight(); //earlier version
+    /**
+     * 选择相册
+     */
+    public void select(View v) {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_IMAGE_CODE);
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //获取图片路径
+        if (requestCode == REQUEST_IMAGE_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumns = {MediaStore.Images.Media.DATA};
+            Cursor c = getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+            c.moveToFirst();
+            int columnIndex = c.getColumnIndex(filePathColumns[0]);
+            ImagePath = c.getString(columnIndex);
+            Bitmap bitmap = BitmapFactory.decodeFile(ImagePath);
+            image.setImageBitmap(bitmap);
+            tv_a.setText("图片大小：" + Utils.getFileSize(new File(ImagePath)));
+            c.close();
         }
     }
+
+
 }

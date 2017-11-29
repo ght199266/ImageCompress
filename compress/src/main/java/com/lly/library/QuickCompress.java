@@ -1,10 +1,10 @@
-package com.lly.imagecompress;
+package com.lly.library;
 
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 
-import com.lly.imagecompress.call.CompressCallback;
-import com.lly.imagecompress.compress.CompressOptions;
+import com.lly.library.call.CompressCallback;
+import com.lly.library.compress.CompressOptions;
 
 import java.io.File;
 import java.io.IOException;

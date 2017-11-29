@@ -1,4 +1,4 @@
-package com.lly.imagecompress.compress;
+package com.lly.library.compress;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

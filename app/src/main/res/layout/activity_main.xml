@@ -8,11 +8,25 @@
     tools:context="com.lly.imagecompress.MainActivity">
 
 
-    <ImageView
-        android:id="@+id/image"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4" />
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorPrimary" />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 
     <LinearLayout
@@ -24,7 +38,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="comress"
+            android:onClick="select"
             android:text="选择图片" />
 
 
@@ -32,16 +46,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:onClick="comress"
             android:text="压缩" />
 
     </LinearLayout>
 
 
-    <ImageView
-        android:id="@+id/image2"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4" />
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+
+
+        <TextView
+            android:id="@+id/tv_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorPrimary" />
+
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 
 </LinearLayout>
