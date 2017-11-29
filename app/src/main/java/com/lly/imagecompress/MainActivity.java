@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void comress(View view) {
         //Rxjava方式
-        rxJava();
+//        rxJava();
         //接口回调方式
-//        executeCall();
+        executeCall();
     }
 
     /**
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap factory = BitmapFactory.decodeFile(file.getAbsolutePath());
                 image2.setImageBitmap(factory);
                 tv_b.setText("图片大小：" + Utils.getFileSize(file));
+                Log.v("test", "" + Thread.currentThread().getName());
             }
 
             @Override

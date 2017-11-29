@@ -16,6 +16,7 @@
                 .quality(75)
                 .compressFormat(Bitmap.CompressFormat.JPEG)
                 .outputPath(getPath()).build();
+
         quickCompress.execute(new File(ImagePath), new CompressCallback() {
 
             @Override
@@ -35,7 +36,9 @@
 ##### RxJava方式
 
 ~~~java
- Flowable.just(ImagePath).subscribeOn(Schedulers.io()).map(new Function<String, File>() {
+    Flowable.just(ImagePath)
+    .subscribeOn(Schedulers.io())
+    .map(new Function<String, File>() {
             @Override
             public File apply(@NonNull String path) throws Exception {
                 QuickCompress quickCompress = new QuickCompress.Builder()
@@ -46,7 +49,8 @@
                         .outputPath(getPath()).build();
                 return quickCompress.load(new File(path));
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<File>() {
+        }).observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Consumer<File>() {
             @Override
             public void accept(@NonNull File file) throws Exception {
 

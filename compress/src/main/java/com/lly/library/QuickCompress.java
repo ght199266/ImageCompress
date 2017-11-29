@@ -1,6 +1,9 @@
 package com.lly.library;
 
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.lly.library.call.CompressCallback;
@@ -21,7 +24,17 @@ import java.util.concurrent.Executors;
  * @description
  */
 
-public class QuickCompress {
+public class QuickCompress implements Handler.Callback {
+    /**
+     * 压缩完成
+     */
+    private static final int MESSAGE_COMPRESS_SUCCESS = 1;
+    /**
+     * 压缩失败
+     */
+    private static final int MESSAGE_COMPRESS_FAUL = 2;
+
+    private CompressCallback mCompressCallback;
 
     private int mMaxWidth;
     private int mMaxHeight;
@@ -30,6 +43,8 @@ public class QuickCompress {
     private Bitmap.CompressFormat format;
 
     private ExecutorService mSingleThreadExecutor;
+    private Handler mHandler;
+
 
     public QuickCompress(Builder builder) {
         this.mMaxHeight = builder.maxHeight;
@@ -38,31 +53,48 @@ public class QuickCompress {
         this.outputPath = builder.outputPath;
         this.format = builder.format;
         mSingleThreadExecutor = Executors.newSingleThreadExecutor();
+        mHandler = new Handler(Looper.getMainLooper(), this);
     }
 
+    /**
+     * 压缩图片
+     *
+     * @param file     文件路径
+     * @param callback 接口回调
+     */
     public void execute(final File file, final CompressCallback callback) {
+        this.mCompressCallback = callback;
         mSingleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     File outPutFile = CompressOptions.compress(file, mMaxWidth, mMaxHeight, format, mQuality, outputPath);
-                    callback.onComplete(outPutFile);
+                    mHandler.sendMessage(mHandler.obtainMessage(MESSAGE_COMPRESS_SUCCESS, outPutFile));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    callback.onFail(e.toString());
+                    mHandler.sendMessage(mHandler.obtainMessage(MESSAGE_COMPRESS_FAUL, e.toString()));
                 }
             }
         });
     }
 
-    public File load(final File file) {
-        File file1 = null;
-        try {
-            file1 = CompressOptions.compress(file, mMaxWidth, mMaxHeight, format, mQuality, outputPath);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public File load(final File file) throws IOException {
+        return CompressOptions.compress(file, mMaxWidth, mMaxHeight, format, mQuality, outputPath);
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MESSAGE_COMPRESS_SUCCESS:
+                mCompressCallback.onComplete((File) msg.obj);
+                break;
+            case MESSAGE_COMPRESS_FAUL:
+                mCompressCallback.onFail((String) msg.obj);
+                break;
+            default:
+                break;
         }
-        return file1;
+        return false;
     }
 
 
