@@ -7,7 +7,8 @@
 #### 如何使用
 
 ~~~java 
-compile 'com.lly:compress:1.0' ~~~
+compile 'com.lly:compress:1.0' 
+~~~
 
 #### 支持异步调用和RxJava二种方式调用
 
