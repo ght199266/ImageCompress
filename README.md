@@ -4,6 +4,10 @@
 
 ![image](https://github.com/ght199266/ImageCompress/blob/master/app/src/screenshots/screen.png)
 
+#### 如何使用
+
+~ compile 'com.lly:compress:1.0' ~
+
 #### 支持异步调用和RxJava二种方式调用
 
 ##### 异步方式
